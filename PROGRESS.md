@@ -260,12 +260,30 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 - None
 
 ## Current Phase
-**Phase 5 — Sprint Management & Bulk Operations (NEXT):**
+**Phase 5 — Sprint Management & Bulk Operations (IN PROGRESS):**
 - Sprint CRUD & management
 - Sprint planning & burndown charts
 - Bulk operations on tasks
 - Task import/export (CSV)
 - Advanced reporting
+
+### Completed in Phase 5:
+- ✅ Sprint API routes (GET, POST, PATCH, DELETE /api/sprints)
+- ✅ Sprint task management API (/api/sprints/[id]/tasks)
+- ✅ SprintList component with create dialog
+- ✅ SprintView component with progress tracking
+- ✅ Sprint tab integrated into workspace page
+- ✅ BulkOperations component with floating action bar
+- ✅ Bulk API endpoint (/api/tasks/bulk) for PATCH/DELETE
+- ✅ Batch actions: move, priority, assignee, label, archive, delete
+- ✅ Activity logging for bulk operations
+- ✅ GitHub branch: `phase-5-sprints-bulk` pushed
+
+### In Progress:
+- [ ] Sprint burndown chart with Recharts
+- [ ] Task import/export (CSV)
+- [ ] Sprint detail page route
+- [ ] Advanced reporting
 
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed
