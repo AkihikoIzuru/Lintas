@@ -36,6 +36,7 @@ import {
   Filter,
   X,
   ChevronDown,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -569,6 +570,12 @@ export default function ProjectBoardPage({
             </div>
             <div className="flex items-center gap-2">
               <NotificationBell />
+              <Link href={`/w/${params.slug}/projects/${params.projectId}/features`}>
+                <Button variant="outline" size="sm">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Fitur
+                </Button>
+              </Link>
               <Link href={`/w/${params.slug}/projects/${params.projectId}/settings`}>
                 <Button variant="outline" size="sm">
                   <Settings className="w-4 h-4 mr-2" />
