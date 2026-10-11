@@ -269,6 +269,63 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 **Started:** 2026-10-11  
 **Completed:** 2026-10-11
 
+### ✅ Phase 7 — Notifications & Real-time (IN PROGRESS)
+**Status:** Notification system and activity feed complete, real-time updates pending  
+**Started:** 2026-10-11  
+**Completed:** In Progress
+
+#### Phase 7 Completed Features:
+- ✅ **Notification System:**
+  - In-app notifications with 10 event types
+  - Notification API: `/api/notifications` (list, mark all as read)
+  - Single notification API: `/api/notifications/[id]` (mark read, delete)
+  - Notification bell component in header with dropdown
+  - Unread count badge
+  - Real-time polling (30s interval)
+  - Mark as read/unread functionality
+  - Delete individual notifications
+
+- ✅ **Notification Settings:**
+  - Per-channel preferences (email, push, in_app)
+  - Per-event-type granular control
+  - Settings API: `/api/notification-settings` (GET, POST)
+  - Settings UI in notification panel
+  - Upsert logic for efficient updates
+
+- ✅ **Notification Helpers (lib/notifications.ts):**
+  - createNotification, createBulkNotifications
+  - notifyTaskAssigned - notify when assigned to task
+  - notifyTaskMentioned - notify when mentioned in comment
+  - notifyTaskCommented - notify task watchers of new comment
+  - notifyTaskDueSoon - notify assignees of upcoming due date
+  - notifyTaskOverdue - notify assignees of overdue tasks
+  - notifySprintStarting - notify team of sprint start
+  - notifySprintEnding - notify team of sprint end
+
+- ✅ **Activity Feed:**
+  - Activity API: `/api/activity` with filtering
+  - Filter by project, task, workspace, user
+  - 21 activity types tracked
+  - ActivityFeed component with user/type filters
+  - Real-time activity log display
+  - Pagination support
+
+- ✅ **UI Components:**
+  - Notifications - Full notification panel
+  - NotificationBell - Header bell with dropdown and count
+  - ActivityFeed - Comprehensive activity log
+  - Integrated into project board header
+
+- ✅ **GitHub Integration:**
+  - Branch `phase-7-notifications-realtime` created and pushed
+  - Initial notification system committed
+
+#### Phase 7 Pending Features:
+- ⏳ Email notifications (requires email service setup)
+- ⏳ Push notifications (requires service worker setup)
+- ⏳ Real-time updates via WebSockets
+- ⏳ Live collaboration indicators
+
 #### Phase 6 Completed Features:
 - ✅ **Global Search (Cmd+K):**
   - Search across tasks, projects, comments
@@ -361,12 +418,12 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
   - All features committed with proper attribution
 
 ## Current Phase
-**Phase 7 — Notifications & Real-time (NEXT):**
-- Notification system
-- Email notifications
-- Push notifications
-- Activity feed
-- Real-time updates (WebSockets)
+**Phase 7 — Notifications & Real-time (IN PROGRESS):**
+- Notification system ✅
+- Email notifications (pending email service)
+- Push notifications (pending service worker)
+- Activity feed ✅
+- Real-time updates (WebSockets) - PENDING
 
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed
@@ -385,13 +442,13 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 ---
 
 **Last Updated:** 2026-10-11  
-**Current Phase:** 6 of 9 (COMPLETE)  
-**Overall Progress:** ~67%
+**Current Phase:** 7 of 9 (IN PROGRESS)  
+**Overall Progress:** ~75%
 
 ## Summary
 
-Phases 1-6 are complete with:
-- 150+ files created
+Phases 1-6 complete, Phase 7 in progress with:
+- 165+ files created
 - Full authentication system with OAuth
 - Complete workspace & project management
 - Working Kanban board with drag-and-drop
@@ -408,11 +465,13 @@ Phases 1-6 are complete with:
 - Custom fields (8 types)
 - Automation rules (visual builder)
 - Webhooks with signature verification
+- In-app notification system with activity feed
 
-**Current Status:** Core project management features + advanced views + sprint management + search & advanced features complete.
+**Current Status:** Core features + advanced features + notifications complete. Email/push notifications and real-time WebSockets pending.
 
 **Next Steps:**
 1. Run manual setup: `npm install && npm run db:setup`
 2. Verify build: `npm run lint && npm run typecheck && npm run build`
 3. Test application: `npm run dev` and test all features
-4. Continue to Phase 7: Notifications & Real-time
+4. Complete Phase 7: Add email/push notifications and WebSockets
+5. Continue to Phase 8: Advanced Project Features

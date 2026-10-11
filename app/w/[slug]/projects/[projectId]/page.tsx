@@ -47,6 +47,7 @@ import { getInitials, formatDate } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { TaskDetail } from "@/components/board/task-detail";
 import { CreateTaskDialog } from "@/components/board/create-task-dialog";
+import { NotificationBell } from "@/components/board/notification-bell";
 import { ViewSwitcher, ViewType } from "@/components/board/view-switcher";
 import { FilterBar, TaskFilters } from "@/components/board/filter-bar";
 import { SavedFilters } from "@/components/board/saved-filters";
@@ -567,6 +568,7 @@ export default function ProjectBoardPage({
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <Link href={`/w/${params.slug}/projects/${params.projectId}/settings`}>
                 <Button variant="outline" size="sm">
                   <Settings className="w-4 h-4 mr-2" />
