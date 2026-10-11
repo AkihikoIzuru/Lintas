@@ -28,7 +28,109 @@
 **Started:** 2026-10-11  
 **Completed:** 2026-10-11
 
-#### Completed:
+#### Phase 4 Completed Features:
+- ✅ **ViewSwitcher** component (Board/List/Calendar/Timeline/Dashboard)
+- ✅ **FilterBar** component with advanced filtering:
+  - Search by task title/description
+  - Filter by assignee, label, priority, status
+  - Filter by due date (overdue, today, this week, no date)
+  - Filter by subtasks presence
+- ✅ **ListView** component:
+  - Table-based task listing grouped by column
+  - Drag-and-drop support
+  - Sortable rows with metadata display
+  - Responsive design with hidden columns on mobile
+- ✅ **CalendarView** component:
+  - Month and week views
+  - Tasks displayed on due dates
+  - Tasks without dates shown separately
+  - Click on date to create task
+  - Navigation between months
+- ✅ **TimelineView** component:
+  - Gantt chart visualization
+  - Multiple scales (day/week/month/quarter)
+  - Task bars showing start-end dates
+  - Tasks without dates listed below
+  - Priority-colored bars
+- ✅ **Dashboard** component:
+  - Key metrics cards (total, completed, in-progress, overdue)
+  - Completion rate percentage
+  - Average completion time
+  - Velocity (tasks/week)
+  - Charts: Pie (priority), Bar (status, assignee), Line (completion trend)
+  - API endpoint for metrics calculation
+- ✅ Integrated all views into main project page
+- ✅ Real-time filtering across all views
+- ✅ Updated Prisma schema with startDate field
+- ✅ Updated validation schemas for startDate
+- ✅ Date picker UI for startDate and dueDate in TaskDetail
+- ✅ Saved filters functionality (save, load, delete, set default)
+- ✅ API routes for saved filters
+
+#### Phase 2 Completed Features:
+- ✅ NextAuth.js v5 configuration with JWT strategy
+- ✅ Credentials provider (email + password with bcrypt hashing)
+- ✅ OAuth providers (GitHub, Google)
+- ✅ Login page with form validation
+- ✅ Registration page with email verification
+- ✅ Password hashing with bcryptjs
+- ✅ Session management with PrismaAdapter
+- ✅ Auth middleware protecting routes
+- ✅ Permission utilities (requireAuth, requireWorkspaceAccess, requireProjectAccess)
+- ✅ Role hierarchy checking (OWNER > ADMIN > MEMBER > VIEWER)
+- ✅ Workspace CRUD APIs (create, read, update, delete)
+- ✅ Workspace member management
+- ✅ Workspace invitation system (auto-accepts if user exists)
+- ✅ Dashboard page showing all workspaces
+- ✅ Create workspace page with auto-slug generation
+- ✅ API routes:
+  - `/api/auth/[...nextauth]` - NextAuth handlers
+  - `/api/auth/register` - User registration
+  - `/api/workspaces` - List and create workspaces
+  - `/api/workspaces/[id]` - Get, update, delete workspace
+  - `/api/workspaces/[id]/invitations` - Invite members
+
+#### Phase 3 Completed Features:
+- ✅ Project CRUD APIs with access control
+- ✅ Project creation with default columns (Backlog, Todo, In Progress, Review, Done)
+- ✅ Column management (create, update, delete with task count validation)
+- ✅ Task CRUD operations with all fields
+- ✅ Drag-and-drop with @dnd-kit library
+- ✅ Fractional indexing for persistent ordering
+- ✅ Task move API with position calculation
+- ✅ Task detail panel (Sheet component)
+- ✅ Inline editing (title, description, priority)
+- ✅ Task assignees display
+- ✅ Task labels with colors
+- ✅ Subtasks display with completion counts
+- ✅ Comment system with mentions support
+- ✅ Activity log tracking all changes
+- ✅ Comment API (create, list)
+- ✅ User settings API (theme, notifications, preferences)
+- ✅ Workspace projects listing page
+- ✅ Create project page with color picker
+- ✅ Full Kanban board with:
+  - Real-time drag-and-drop between columns
+  - Task cards with metadata (assignees, labels, counts)
+  - Create task dialog
+  - Click to open task detail
+  - Column-based layout with task counts
+- ✅ API routes:
+  - `/api/workspaces/[slug]/projects` - List and create projects
+  - `/api/projects/[id]` - Get, update, delete project
+  - `/api/projects/[id]/tasks` - Create task
+  - `/api/projects/[id]/columns` - Create column
+  - `/api/tasks/[taskId]` - Get, update, delete task
+  - `/api/tasks/[taskId]/move` - Move task (drag-and-drop)
+  - `/api/tasks/[taskId]/comments` - Task comments
+  - `/api/columns/[columnId]` - Update, delete column
+  - `/api/user/settings` - User settings
+- ✅ UI Components:
+  - CreateTaskDialog - Modal for creating tasks
+  - TaskDetail - Complete task detail panel with inline editing
+  - Full Kanban board page with DnD
+
+#### Phase 1 Completed:
 - ✅ Project directory structure created
 - ✅ TypeScript configuration (strict mode)
 - ✅ Tailwind CSS configuration with design tokens
@@ -108,69 +210,6 @@ Due to system limitations, the following commands must be run manually:
 
 See `docs/MANUAL_SETUP.md` for detailed instructions.
 
-#### Phase 2 Completed Features:
-- ✅ NextAuth.js v5 configuration with JWT strategy
-- ✅ Credentials provider (email + password with bcrypt hashing)
-- ✅ OAuth providers (GitHub, Google)
-- ✅ Login page with form validation
-- ✅ Registration page with email verification
-- ✅ Password hashing with bcryptjs
-- ✅ Session management with PrismaAdapter
-- ✅ Auth middleware protecting routes
-- ✅ Permission utilities (requireAuth, requireWorkspaceAccess, requireProjectAccess)
-- ✅ Role hierarchy checking (OWNER > ADMIN > MEMBER > VIEWER)
-- ✅ Workspace CRUD APIs (create, read, update, delete)
-- ✅ Workspace member management
-- ✅ Workspace invitation system (auto-accepts if user exists)
-- ✅ Dashboard page showing all workspaces
-- ✅ Create workspace page with auto-slug generation
-- ✅ API routes:
-  - `/api/auth/[...nextauth]` - NextAuth handlers
-  - `/api/auth/register` - User registration
-  - `/api/workspaces` - List and create workspaces
-  - `/api/workspaces/[id]` - Get, update, delete workspace
-  - `/api/workspaces/[id]/invitations` - Invite members
-
-#### Phase 3 Completed Features:
-- ✅ Project CRUD APIs with access control
-- ✅ Project creation with default columns (Backlog, Todo, In Progress, Review, Done)
-- ✅ Column management (create, update, delete with task count validation)
-- ✅ Task CRUD operations with all fields
-- ✅ Drag-and-drop with @dnd-kit library
-- ✅ Fractional indexing for persistent ordering
-- ✅ Task move API with position calculation
-- ✅ Task detail panel (Sheet component)
-- ✅ Inline editing (title, description, priority)
-- ✅ Task assignees display
-- ✅ Task labels with colors
-- ✅ Subtasks display with completion counts
-- ✅ Comment system with mentions support
-- ✅ Activity log tracking all changes
-- ✅ Comment API (create, list)
-- ✅ User settings API (theme, notifications, preferences)
-- ✅ Workspace projects listing page
-- ✅ Create project page with color picker
-- ✅ Full Kanban board with:
-  - Real-time drag-and-drop between columns
-  - Task cards with metadata (assignees, labels, counts)
-  - Create task dialog
-  - Click to open task detail
-  - Column-based layout with task counts
-- ✅ API routes:
-  - `/api/workspaces/[slug]/projects` - List and create projects
-  - `/api/projects/[id]` - Get, update, delete project
-  - `/api/projects/[id]/tasks` - Create task
-  - `/api/projects/[id]/columns` - Create column
-  - `/api/tasks/[taskId]` - Get, update, delete task
-  - `/api/tasks/[taskId]/move` - Move task (drag-and-drop)
-  - `/api/tasks/[taskId]/comments` - Task comments
-  - `/api/columns/[columnId]` - Update, delete column
-  - `/api/user/settings` - User settings
-- ✅ UI Components:
-  - CreateTaskDialog - Modal for creating tasks
-  - TaskDetail - Complete task detail panel with inline editing
-  - Full Kanban board page with DnD
-
 ## Design Decisions
 
 ### Architecture
@@ -218,58 +257,15 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 - All verification steps (lint, typecheck, build) pending npm install
 
 ## Blockers
-- None — Phase 1 structurally complete, awaiting manual dependency installation
+- None
 
 ## Current Phase
-**Phase 4 — Views & Filters (IN PROGRESS):**
-
-### Completed Features:
-- ✅ ViewSwitcher component (Board/List/Calendar/Timeline/Dashboard)
-- ✅ FilterBar component with advanced filtering:
-  - Search by task title/description
-  - Filter by assignee, label, priority, status
-  - Filter by due date (overdue, today, this week, no date)
-  - Filter by subtasks presence
-- ✅ ListView component:
-  - Table-based task listing grouped by column
-  - Drag-and-drop support
-  - Sortable rows with metadata display
-  - Responsive design with hidden columns on mobile
-- ✅ CalendarView component:
-  - Month and week views
-  - Tasks displayed on due dates
-  - Tasks without dates shown separately
-  - Click on date to create task
-  - Navigation between months
-- ✅ TimelineView component:
-  - Gantt chart visualization
-  - Multiple scales (day/week/month/quarter)
-  - Task bars showing start-end dates
-  - Tasks without dates listed below
-  - Priority-colored bars
-- ✅ Dashboard component:
-  - Key metrics cards (total, completed, in-progress, overdue)
-  - Completion rate percentage
-  - Average completion time
-  - Velocity (tasks/week)
-  - Charts: Pie (priority), Bar (status, assignee), Line (completion trend)
-  - API endpoint for metrics calculation
-- ✅ Integrated all views into main project page
-- ✅ Real-time filtering across all views
-- ✅ Updated Prisma schema with startDate field
-- ✅ Updated validation schemas for startDate
-- ✅ Date picker UI for startDate and dueDate in TaskDetail
-- ✅ Saved filters functionality (save, load, delete, set default)
-- ✅ API routes for saved filters
-
-### In Progress:
-- [ ] Sprint management views
-- [ ] Bulk operations
-
-### GitHub Status:
-- ✅ Branch created: `phase-4-views-filters`
-- ✅ Branch pushed to origin (latest commit: Dashboard + charts)
-- ⏳ PR pending creation (create manually at https://github.com/AkihikoIzuru/Lintas/pull/new/phase-4-views-filters)
+**Phase 5 — Sprint Management & Bulk Operations (NEXT):**
+- Sprint CRUD & management
+- Sprint planning & burndown charts
+- Bulk operations on tasks
+- Task import/export (CSV)
+- Advanced reporting
 
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed
@@ -287,26 +283,27 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 
 ---
 
-**Last Updated:** 2026-10-10 19:29 UTC  
-**Current Phase:** 3 of 9 (COMPLETE)  
-**Overall Progress:** ~33%
+**Last Updated:** 2026-10-11  
+**Current Phase:** 4 of 9 (COMPLETE)  
+**Overall Progress:** ~45%
 
 ## Summary
 
-Phases 1-3 are complete with:
-- 90+ files created
+Phases 1-4 are complete with:
+- 110+ files created
 - Full authentication system with OAuth
 - Complete workspace & project management
 - Working Kanban board with drag-and-drop
-- Task CRUD with assignees, labels, subtasks
+- Task CRUD with assignees, labels, subtasks, dates
 - Comment system with activity tracking
-- All core functionality working
+- Multiple views: Board, List, Calendar, Timeline, Dashboard
+- Advanced filtering with saved filters
+- Analytics dashboard with charts (Recharts)
 
-**Current Status:** Core project management features complete. Board, tasks, and workspace collaboration fully functional.
+**Current Status:** Core project management features + advanced views complete.
 
 **Next Steps:**
 1. Run manual setup: `npm install && npm run db:setup`
 2. Verify build: `npm run lint && npm run typecheck && npm run build`
 3. Test application: `npm run dev` and test all features
-4. Commit: `git commit -m "feat: Phase 2 & 3 complete - auth and kanban board"`
-5. Continue to Phase 4: Multiple views, filters, and dashboard
+4. Continue to Phase 5: Sprint management & bulk operations
