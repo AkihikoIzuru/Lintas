@@ -1,7 +1,24 @@
 {
   "permissions": {
     "allow": [
-      "\"permissions\": {\r  \"allow\": [\r    \"Bash(npm *)\",\r    \"Bash(npx *)\",\r    \"Bash(node *)\",\r    \"Bash(git status)\",\r    \"Bash(git diff *)\",\r    \"Bash(git add *)\",\r    \"Bash(git commit *)\",\r    \"Bash(git log *)\",\r    \"Bash(docker compose *)\",\r    \"Bash(prisma *)\"\r  ],\r  \"deny\": [\r    \"Bash(git push --force *)\",\r    \"Bash(rm -rf *)\",\r    \"Read(./.env)\"\r  ]\r}"
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git log *)",
+      "Bash(docker compose *)",
+      "Bash(prisma *)",
+      "Bash(git checkout *)",
+      "Bash(git merge *)",
+      "Bash(git push *)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(rm -rf *)",
+      "Read(./.env)"
     ]
   }
 }

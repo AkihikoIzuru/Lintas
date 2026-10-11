@@ -46,6 +46,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
+import { Dependencies } from "./dependencies";
+import { CustomFieldInput } from "./custom-field-input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TaskDetailProps {
   taskId: string;
@@ -360,6 +363,20 @@ export function TaskDetail({ taskId, projectId }: TaskDetailProps) {
               <p className="text-sm text-muted-foreground">Belum ada label</p>
             )}
           </div>
+        </div>
+
+        {/* Custom Fields */}
+        <div className="space-y-2">
+          <Label>Custom Fields</Label>
+          <CustomFieldInput taskId={taskId} projectId={projectId} />
+        </div>
+
+        <Separator />
+
+        {/* Dependencies */}
+        <div className="space-y-2">
+          <Label>Dependensi Tugas</Label>
+          <Dependencies taskId={taskId} projectId={projectId} />
         </div>
 
         <Separator />
