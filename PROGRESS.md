@@ -246,19 +246,19 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 - ✅ Real-time filtering across all views
 - ✅ Updated Prisma schema with startDate field
 - ✅ Updated validation schemas for startDate
+- ✅ Date picker UI for startDate and dueDate in TaskDetail
+- ✅ Saved filters functionality (save, load, delete, set default)
+- ✅ API routes for saved filters
 
 ### In Progress:
-- [ ] Date picker UI for startDate and dueDate in TaskDetail
-- [ ] Saved filters functionality
-- [ ] Dashboard with charts and metrics
+- [ ] Dashboard with charts and metrics (burndown, velocity, completion rate)
 - [ ] Sprint management views
 - [ ] Bulk operations
-- [ ] Database migration for startDate field
 
 ### GitHub Status:
 - ✅ Branch created: `phase-4-views-filters`
-- ✅ Branch pushed to origin
-- ⏳ PR pending creation (gh CLI timeout - create manually at https://github.com/AkihikoIzuru/Lintas/pull/new/phase-4-views-filters)
+- ✅ Branch pushed to origin (latest commit: date picker + saved filters)
+- ⏳ PR pending creation (create manually at https://github.com/AkihikoIzuru/Lintas/pull/new/phase-4-views-filters)
 
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed

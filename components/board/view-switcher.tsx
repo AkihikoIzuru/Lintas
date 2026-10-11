@@ -1,10 +1,10 @@
 "use client";
 
-import { LayoutGrid, List, Calendar, GanttChart } from "lucide-react";
+import { LayoutGrid, List, Calendar, GanttChart, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export type ViewType = "board" | "list" | "calendar" | "timeline";
+export type ViewType = "board" | "list" | "calendar" | "timeline" | "dashboard";
 
 interface ViewSwitcherProps {
   view: ViewType;
@@ -16,6 +16,7 @@ const views = [
   { type: "list" as const, icon: List, label: "List" },
   { type: "calendar" as const, icon: Calendar, label: "Calendar" },
   { type: "timeline" as const, icon: GanttChart, label: "Timeline" },
+  { type: "dashboard" as const, icon: BarChart2, label: "Dashboard" },
 ];
 
 export function ViewSwitcher({ view, onViewChange }: ViewSwitcherProps) {

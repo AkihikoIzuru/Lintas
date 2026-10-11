@@ -50,6 +50,7 @@ import { CreateTaskDialog } from "@/components/board/create-task-dialog";
 import { ViewSwitcher, ViewType } from "@/components/board/view-switcher";
 import { FilterBar, TaskFilters } from "@/components/board/filter-bar";
 import { SavedFilters } from "@/components/board/saved-filters";
+import { Dashboard } from "@/components/board/dashboard";
 import { ListView } from "@/components/board/list-view";
 import { CalendarView } from "@/components/board/calendar-view";
 import { TimelineView } from "@/components/board/timeline-view";
@@ -654,6 +655,13 @@ export default function ProjectBoardPage({
                 columns={project.columns}
                 onTaskClick={setSelectedTaskId}
                 onCreateTask={setCreateDialogColumnId}
+              />
+            )}
+
+            {view === "dashboard" && (
+              <Dashboard
+                projectId={params.projectId}
+                workspaceId={project.workspace.id}
               />
             )}
           </div>
