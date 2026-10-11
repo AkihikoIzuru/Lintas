@@ -259,31 +259,53 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 ## Blockers
 - None
 
+### ✅ Phase 5 — Sprint Management & Bulk Operations (COMPLETED)
+**Status:** Sprint management, bulk operations, CSV import/export, and burndown charts complete  
+**Started:** 2026-10-11  
+**Completed:** 2026-10-11
+
+#### Phase 5 Completed Features:
+- ✅ **Sprint Management:**
+  - Sprint CRUD API routes (GET, POST, PATCH, DELETE /api/sprints)
+  - Sprint task management API (/api/sprints/[id]/tasks)
+  - SprintList component with create dialog
+  - SprintView component with progress tracking
+  - Sprint tab integrated into workspace page
+  - Sprint detail page at `/w/[slug]/sprints/[id]`
+  - Sprint metrics cards (completed tasks, progress, days remaining, team members, overdue tasks)
+  - Board, List, and Burndown tabs in sprint detail
+- ✅ **Sprint Burndown Chart:**
+  - SprintBurndown component with Recharts LineChart
+  - API endpoint `/api/sprints/[id]/burndown` for daily metrics
+  - Ideal vs actual burndown comparison
+  - Daily completed/remaining task calculation
+- ✅ **Bulk Operations:**
+  - BulkOperations component with floating action bar
+  - Bulk API endpoint (/api/tasks/bulk) for PATCH/DELETE
+  - Batch actions: move, priority, assignee, label, archive, delete, export, copy
+  - Activity logging for bulk operations
+  - Access control validation per task
+- ✅ **CSV Import/Export:**
+  - CsvImportExport component with drag-drop file upload
+  - `/api/tasks/import` endpoint with column/assignee/label validation
+  - `/api/tasks/export` endpoint with CSV and JSON format support
+  - Template generation with example data
+  - Preview before import with error handling
+- ✅ **Navigation & Integration:**
+  - Sprint list navigation to detail page
+  - Workspace API updated to return workspace info
+  - Router navigation from sprint cards
+- ✅ **GitHub Integration:**
+  - Branch `phase-5-sprints-bulk` created, pushed, and merged to main
+  - All features committed with proper attribution
+
 ## Current Phase
-**Phase 5 — Sprint Management & Bulk Operations (IN PROGRESS):**
-- Sprint CRUD & management
-- Sprint planning & burndown charts
-- Bulk operations on tasks
-- Task import/export (CSV)
-- Advanced reporting
-
-### Completed in Phase 5:
-- ✅ Sprint API routes (GET, POST, PATCH, DELETE /api/sprints)
-- ✅ Sprint task management API (/api/sprints/[id]/tasks)
-- ✅ SprintList component with create dialog
-- ✅ SprintView component with progress tracking
-- ✅ Sprint tab integrated into workspace page
-- ✅ BulkOperations component with floating action bar
-- ✅ Bulk API endpoint (/api/tasks/bulk) for PATCH/DELETE
-- ✅ Batch actions: move, priority, assignee, label, archive, delete
-- ✅ Activity logging for bulk operations
-- ✅ GitHub branch: `phase-5-sprints-bulk` pushed
-
-### In Progress:
-- [ ] Sprint burndown chart with Recharts
-- [ ] Task import/export (CSV)
-- [ ] Sprint detail page route
-- [ ] Advanced reporting
+**Phase 6 — Search & Advanced Features (NEXT):**
+- Global search across workspaces
+- Task dependencies
+- Custom fields
+- Automation rules
+- Webhooks
 
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed
@@ -302,13 +324,13 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 ---
 
 **Last Updated:** 2026-10-11  
-**Current Phase:** 4 of 9 (COMPLETE)  
-**Overall Progress:** ~45%
+**Current Phase:** 5 of 9 (COMPLETE)  
+**Overall Progress:** ~55%
 
 ## Summary
 
-Phases 1-4 are complete with:
-- 110+ files created
+Phases 1-5 are complete with:
+- 130+ files created
 - Full authentication system with OAuth
 - Complete workspace & project management
 - Working Kanban board with drag-and-drop
@@ -317,11 +339,14 @@ Phases 1-4 are complete with:
 - Multiple views: Board, List, Calendar, Timeline, Dashboard
 - Advanced filtering with saved filters
 - Analytics dashboard with charts (Recharts)
+- Sprint management with burndown charts
+- Bulk operations on tasks (8 actions)
+- CSV import/export functionality
 
-**Current Status:** Core project management features + advanced views complete.
+**Current Status:** Core project management features + advanced views + sprint management complete.
 
 **Next Steps:**
 1. Run manual setup: `npm install && npm run db:setup`
 2. Verify build: `npm run lint && npm run typecheck && npm run build`
 3. Test application: `npm run dev` and test all features
-4. Continue to Phase 5: Sprint management & bulk operations
+4. Continue to Phase 6: Search & advanced features
