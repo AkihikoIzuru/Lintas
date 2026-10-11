@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lintas-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lintas-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: lintas-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lintas
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_change_this}
+      POSTGRES_DB: lintas
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lintas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lintas-network
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: lintas-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    networks:
+      - lintas-network
+
+volumes:
+  postgres_data_prod:
+  caddy_data:
+  caddy_config:
+
+networks:
+  lintas-network:
+    driver: bridge

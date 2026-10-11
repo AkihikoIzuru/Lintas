@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "\"permissions\": {\r  \"allow\": [\r    \"Bash(npm *)\",\r    \"Bash(npx *)\",\r    \"Bash(node *)\",\r    \"Bash(git status)\",\r    \"Bash(git diff *)\",\r    \"Bash(git add *)\",\r    \"Bash(git commit *)\",\r    \"Bash(git log *)\",\r    \"Bash(docker compose *)\",\r    \"Bash(prisma *)\"\r  ],\r  \"deny\": [\r    \"Bash(git push --force *)\",\r    \"Bash(rm -rf *)\",\r    \"Read(./.env)\"\r  ]\r}"
+    ]
+  }
+}
