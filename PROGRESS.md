@@ -219,7 +219,7 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 **Phase 4 — Views & Filters (IN PROGRESS):**
 
 ### Completed Features:
-- ✅ ViewSwitcher component (Board/List/Calendar/Timeline)
+- ✅ ViewSwitcher component (Board/List/Calendar/Timeline/Dashboard)
 - ✅ FilterBar component with advanced filtering:
   - Search by task title/description
   - Filter by assignee, label, priority, status
@@ -242,6 +242,13 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
   - Task bars showing start-end dates
   - Tasks without dates listed below
   - Priority-colored bars
+- ✅ Dashboard component:
+  - Key metrics cards (total, completed, in-progress, overdue)
+  - Completion rate percentage
+  - Average completion time
+  - Velocity (tasks/week)
+  - Charts: Pie (priority), Bar (status, assignee), Line (completion trend)
+  - API endpoint for metrics calculation
 - ✅ Integrated all views into main project page
 - ✅ Real-time filtering across all views
 - ✅ Updated Prisma schema with startDate field
@@ -251,13 +258,12 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 - ✅ API routes for saved filters
 
 ### In Progress:
-- [ ] Dashboard with charts and metrics (burndown, velocity, completion rate)
 - [ ] Sprint management views
 - [ ] Bulk operations
 
 ### GitHub Status:
 - ✅ Branch created: `phase-4-views-filters`
-- ✅ Branch pushed to origin (latest commit: date picker + saved filters)
+- ✅ Branch pushed to origin (latest commit: Dashboard + charts)
 - ⏳ PR pending creation (create manually at https://github.com/AkihikoIzuru/Lintas/pull/new/phase-4-views-filters)
 
 ## Technical Debt / TODOs
