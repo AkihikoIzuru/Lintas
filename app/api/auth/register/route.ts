@@ -1,44 +1,47 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import { registerSchema } from "@/lib/validations";
+import { NextRequest, NextResponse } from 'next/server'
+import { authRateLimiter } from '@/lib/rate-limiter'
+import { z } from 'zod'
+import { hash } from 'bcryptjs'
+import { db } from '@/lib/db'
 
-export async function POST(request: Request) {
+const registerSchema = z.object({
+  name: z.string().min(2, 'Nama minimal 2 karakter').max(100),
+  email: z.string().email('Email tidak valid'),
+  password: z.string().min(8, 'Password minimal 8 karakter'),
+})
+
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const validatedFields = registerSchema.safeParse(body);
-
-    if (!validatedFields.success) {
-      return NextResponse.json(
-        { error: "Data tidak valid" },
-        { status: 400 }
-      );
+    // Rate limiting
+    const rateLimitResult = await authRateLimiter(request)
+    if (!rateLimitResult.success) {
+      return rateLimitResult.response
     }
 
-    const { name, email, password } = validatedFields.data;
+    const body = await request.json()
+    const validatedData = registerSchema.parse(body)
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await db.user.findUnique({
+      where: { email: validatedData.email },
+    })
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Email sudah terdaftar" },
+        { error: 'User already exists', message: 'Email sudah terdaftar' },
         { status: 400 }
-      );
+      )
     }
 
     // Hash password
-    const passwordHash = await bcrypt.hash(password, 10);
+    const hashedPassword = await hash(validatedData.password, 12)
 
     // Create user
-    const user = await prisma.user.create({
+    const user = await db.user.create({
       data: {
-        name,
-        email,
-        passwordHash,
-        emailVerified: new Date(), // Auto-verify for now
+        name: validatedData.name,
+        email: validatedData.email,
+        password: hashedPassword,
       },
       select: {
         id: true,
@@ -46,17 +49,24 @@ export async function POST(request: Request) {
         email: true,
         createdAt: true,
       },
-    });
+    })
 
     return NextResponse.json(
-      { user, message: "Akun berhasil dibuat" },
+      { user, message: 'Registrasi berhasil' },
       { status: 201 }
-    );
+    )
   } catch (error) {
-    console.error("Registration error:", error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      )
+    }
+
+    console.error('Registration error:', error)
     return NextResponse.json(
-      { error: "Terjadi kesalahan server" },
+      { error: 'Internal server error', message: 'Terjadi kesalahan saat registrasi' },
       { status: 500 }
-    );
+    )
   }
 }
