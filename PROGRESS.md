@@ -264,6 +264,67 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 **Started:** 2026-10-11  
 **Completed:** 2026-10-11
 
+### ✅ Phase 6 — Search & Advanced Features (COMPLETED)
+**Status:** Global search, task dependencies, custom fields, automation rules, and webhooks complete  
+**Started:** 2026-10-11  
+**Completed:** 2026-10-11
+
+#### Phase 6 Completed Features:
+- ✅ **Global Search (Cmd+K):**
+  - Search across tasks, projects, comments
+  - Keyboard navigation with arrow keys
+  - Multi-type results with highlighting
+  - Accessible via global keyboard shortcut from anywhere
+  - API: `/api/search` with query, type, projectId, workspaceId, limit params
+
+- ✅ **Task Dependencies:**
+  - Add/remove dependencies between tasks
+  - Three dependency types: blocks, is_blocked_by, relates_to
+  - Cycle detection prevents circular dependencies
+  - API: `/api/tasks/[id]/dependencies` (GET, POST, DELETE)
+
+- ✅ **Custom Fields:**
+  - 8 field types: TEXT, NUMBER, DATE, SELECT, MULTI_SELECT, CHECKBOX, URL, EMAIL
+  - Project-level and workspace-level fields
+  - Drag-drop reordering
+  - Inline editing in task detail panel
+  - Validation per field type
+  - API: `/api/custom-fields`, `/api/custom-fields/[id]`, `/api/custom-fields/[id]/values`
+
+- ✅ **Automation Rules:**
+  - Visual rule builder with tabs: Trigger → Conditions → Actions
+  - Triggers: task.created, task.updated, task.moved, task.completed, task.deleted, comment.created, sprint.started, sprint.completed
+  - Conditions: field, operator, value matching
+  - Actions: move_to_column, set_priority, assign_user, add_label, remove_label, set_custom_field, create_task, send_notification, call_webhook
+  - API: `/api/automation-rules` (CRUD)
+
+- ✅ **Webhooks:**
+  - HTTP callbacks for real-time integrations
+  - 18 event types across tasks, comments, sprints, users, labels, custom fields, dependencies
+  - HMAC SHA256 signature verification (X-Lintas-Signature header)
+  - Test endpoint for verification
+  - Event filtering per webhook
+  - API: `/api/webhooks`, `/api/webhooks/[id]`, `/api/webhooks/[id]/test`
+
+- ✅ **UI Integration:**
+  - Project settings page with 5 tabs (General, Custom Fields, Automation, Webhooks, Search)
+  - GlobalSearchProvider in main layout (Cmd+K everywhere)
+  - Dependencies panel in task detail
+  - CustomFieldInput in task detail
+  - Settings link from project board
+
+- ✅ **Database Schema Extended:**
+  - TaskDependency (with cycle prevention via API)
+  - CustomField & CustomFieldValue (flexible JSON value storage)
+  - AutomationRule (JSON for triggers, conditions, actions)
+  - Webhook (with secret for signing)
+  - NotificationSetting, TimeEntry, RecurringTask, TaskTemplate, ProjectTemplate, Milestone
+
+- ✅ **GitHub Integration:**
+  - Branch `phase-6-search-advanced` created and pushed
+  - PR created for review and merge to main
+  - All commits with proper attribution
+
 #### Phase 5 Completed Features:
 - ✅ **Sprint Management:**
   - Sprint CRUD API routes (GET, POST, PATCH, DELETE /api/sprints)
@@ -300,12 +361,12 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
   - All features committed with proper attribution
 
 ## Current Phase
-**Phase 6 — Search & Advanced Features (NEXT):**
-- Global search across workspaces
-- Task dependencies
-- Custom fields
-- Automation rules
-- Webhooks
+**Phase 7 — Notifications & Real-time (NEXT):**
+- Notification system
+- Email notifications
+- Push notifications
+- Activity feed
+- Real-time updates (WebSockets)
 
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed
@@ -324,13 +385,13 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 ---
 
 **Last Updated:** 2026-10-11  
-**Current Phase:** 5 of 9 (COMPLETE)  
-**Overall Progress:** ~55%
+**Current Phase:** 6 of 9 (COMPLETE)  
+**Overall Progress:** ~67%
 
 ## Summary
 
-Phases 1-5 are complete with:
-- 130+ files created
+Phases 1-6 are complete with:
+- 150+ files created
 - Full authentication system with OAuth
 - Complete workspace & project management
 - Working Kanban board with drag-and-drop
@@ -342,11 +403,16 @@ Phases 1-5 are complete with:
 - Sprint management with burndown charts
 - Bulk operations on tasks (8 actions)
 - CSV import/export functionality
+- Global search (Cmd+K)
+- Task dependencies with cycle detection
+- Custom fields (8 types)
+- Automation rules (visual builder)
+- Webhooks with signature verification
 
-**Current Status:** Core project management features + advanced views + sprint management complete.
+**Current Status:** Core project management features + advanced views + sprint management + search & advanced features complete.
 
 **Next Steps:**
 1. Run manual setup: `npm install && npm run db:setup`
 2. Verify build: `npm run lint && npm run typecheck && npm run build`
 3. Test application: `npm run dev` and test all features
-4. Continue to Phase 6: Search & advanced features
+4. Continue to Phase 7: Notifications & Real-time
