@@ -217,13 +217,43 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 
 ## Current Phase
 **Phase 4 — Views & Filters (IN PROGRESS):**
-- Multiple view types (List, Calendar, Timeline/Gantt)
-- Advanced filtering system
-- Saved filters
-- Dashboard with charts and metrics
-- Task search functionality
-- Sprint management views
-- Bulk operations
+
+### Completed Features:
+- ✅ ViewSwitcher component (Board/List/Calendar/Timeline)
+- ✅ FilterBar component with advanced filtering:
+  - Search by task title/description
+  - Filter by assignee, label, priority, status
+  - Filter by due date (overdue, today, this week, no date)
+  - Filter by subtasks presence
+- ✅ ListView component:
+  - Table-based task listing grouped by column
+  - Drag-and-drop support
+  - Sortable rows with metadata display
+  - Responsive design with hidden columns on mobile
+- ✅ CalendarView component:
+  - Month and week views
+  - Tasks displayed on due dates
+  - Tasks without dates shown separately
+  - Click on date to create task
+  - Navigation between months
+- ✅ TimelineView component:
+  - Gantt chart visualization
+  - Multiple scales (day/week/month/quarter)
+  - Task bars showing start-end dates
+  - Tasks without dates listed below
+  - Priority-colored bars
+- ✅ Integrated all views into main project page
+- ✅ Real-time filtering across all views
+- ✅ Updated Prisma schema with startDate field
+- ✅ Updated validation schemas for startDate
+
+### In Progress:
+- [ ] Date picker UI for startDate and dueDate in TaskDetail
+- [ ] Saved filters functionality
+- [ ] Dashboard with charts and metrics
+- [ ] Sprint management views
+- [ ] Bulk operations
+- [ ] Database migration for startDate field
 
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed

@@ -289,6 +289,7 @@ model Task {
   description  String?      @db.Text
   position     Float        // Fractional indexing within column
   priority     TaskPriority @default(MEDIUM)
+  startDate    DateTime?    // Start date for timeline/gantt view
   dueDate      DateTime?
   estimate     Int?         // Story points or hours
   timeSpent    Int          @default(0) // Minutes
@@ -318,6 +319,7 @@ model Task {
   @@index([columnId])
   @@index([position])
   @@index([priority])
+  @@index([startDate])
   @@index([dueDate])
   @@index([isArchived])
   @@index([creatorId])

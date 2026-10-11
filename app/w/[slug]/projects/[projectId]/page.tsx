@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
   DragEndEvent,
-  DragOverlay,
   DragStartEvent,
+  DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
@@ -29,6 +29,13 @@ import {
   MessageSquare,
   Paperclip,
   CheckSquare,
+  LayoutGrid,
+  List,
+  GanttChart,
+  Search,
+  Filter,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -36,10 +43,38 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { getInitials } from "@/lib/utils";
+import { getInitials, formatDate } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { TaskDetail } from "@/components/board/task-detail";
 import { CreateTaskDialog } from "@/components/board/create-task-dialog";
+import { ViewSwitcher, ViewType } from "@/components/board/view-switcher";
+import { FilterBar, TaskFilters } from "@/components/board/filter-bar";
+import { ListView } from "@/components/board/list-view";
+import { CalendarView } from "@/components/board/calendar-view";
+import { TimelineView } from "@/components/board/timeline-view";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface Task {
   id: string;
@@ -48,6 +83,7 @@ interface Task {
   priority: string;
   position: number;
   dueDate: string | null;
+  startDate: string | null;
   assignees: Array<{
     user: {
       id: string;
@@ -71,6 +107,12 @@ interface Task {
   _count: {
     comments: number;
     attachments: number;
+  };
+  column: {
+    id: string;
+    name: string;
+    color: string;
+    status: string;
   };
 }
 
@@ -96,6 +138,13 @@ interface Project {
   };
 }
 
+const priorityColors = {
+  URGENT: "text-red-500",
+  HIGH: "text-orange-500",
+  MEDIUM: "text-yellow-500",
+  LOW: "text-blue-500",
+};
+
 function TaskCard({ task, onClick }: { task: Task; onClick?: () => void }) {
   const {
     attributes,
@@ -115,13 +164,6 @@ function TaskCard({ task, onClick }: { task: Task; onClick?: () => void }) {
   const completedSubtasks = task.subtasks.filter((st) => st.isCompleted).length;
   const totalSubtasks = task.subtasks.length;
 
-  const priorityColors = {
-    URGENT: "text-red-500",
-    HIGH: "text-orange-500",
-    MEDIUM: "text-yellow-500",
-    LOW: "text-blue-500",
-  };
-
   return (
     <Card
       ref={setNodeRef}
@@ -130,7 +172,6 @@ function TaskCard({ task, onClick }: { task: Task; onClick?: () => void }) {
       {...listeners}
       className="mb-2 cursor-move hover:border-primary transition-colors"
       onClick={(e) => {
-        // Only trigger onClick if not dragging
         if (!isDragging && onClick) {
           onClick();
         }
@@ -164,9 +205,7 @@ function TaskCard({ task, onClick }: { task: Task; onClick?: () => void }) {
               {totalSubtasks > 0 && (
                 <div className="flex items-center gap-1">
                   <CheckSquare className="w-3 h-3" />
-                  <span>
-                    {completedSubtasks}/{totalSubtasks}
-                  </span>
+                  <span>{completedSubtasks}/{totalSubtasks}</span>
                 </div>
               )}
               {task._count.comments > 0 && (
@@ -273,6 +312,16 @@ export default function ProjectBoardPage({
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [createDialogColumnId, setCreateDialogColumnId] = useState<string | null>(null);
+  const [view, setView] = useState<ViewType>("board");
+  const [filters, setFilters] = useState<TaskFilters>({
+    search: "",
+    assignee: null,
+    label: null,
+    priority: null,
+    status: null,
+    dueDate: null,
+    hasSubtasks: null,
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -368,6 +417,107 @@ export default function ProjectBoardPage({
     });
   };
 
+  // Get all unique assignees and labels for filters
+  const allTasks = useMemo(
+    () => data?.project.columns.flatMap((col: Column) => col.tasks) || [],
+    [data]
+  );
+
+  const allAssignees = useMemo(() => {
+    const assigneeMap = new Map();
+    allTasks.forEach((task) => {
+      task.assignees.forEach(({ user }) => {
+        if (!assigneeMap.has(user.id)) {
+          assigneeMap.set(user.id, user);
+        }
+      });
+    });
+    return Array.from(assigneeMap.values());
+  }, [allTasks]);
+
+  const allLabels = useMemo(() => {
+    const labelMap = new Map();
+    allTasks.forEach((task) => {
+      task.labels.forEach(({ label }) => {
+        if (!labelMap.has(label.id)) {
+          labelMap.set(label.id, label);
+        }
+      });
+    });
+    return Array.from(labelMap.values());
+  }, [allTasks]);
+
+  // Apply filters
+  const filteredTasks = useMemo(() => {
+    return allTasks.filter((task) => {
+      // Search filter
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const titleMatch = task.title.toLowerCase().includes(searchLower);
+        const descMatch = task.description?.toLowerCase().includes(searchLower);
+        const labelMatch = task.labels.some(({ label }) =>
+          label.name.toLowerCase().includes(searchLower)
+        );
+        if (!titleMatch && !descMatch && !labelMatch) return false;
+      }
+
+      // Assignee filter
+      if (filters.assignee) {
+        const hasAssignee = task.assignees.some(({ user }) => user.id === filters.assignee);
+        if (!hasAssignee) return false;
+      }
+
+      // Label filter
+      if (filters.label) {
+        const hasLabel = task.labels.some(({ label }) => label.id === filters.label);
+        if (!hasLabel) return false;
+      }
+
+      // Priority filter
+      if (filters.priority && task.priority !== filters.priority) {
+        return false;
+      }
+
+      // Status/Column filter
+      if (filters.status && task.column.id !== filters.status) {
+        return false;
+      }
+
+      // Due date filter
+      if (filters.dueDate) {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+        if (filters.dueDate === "overdue") {
+          if (!task.dueDate || new Date(task.dueDate) >= today) return false;
+        } else if (filters.dueDate === "today") {
+          if (!task.dueDate || !isSameDay(new Date(task.dueDate), today)) return false;
+        } else if (filters.dueDate === "this-week") {
+          if (!task.dueDate || new Date(task.dueDate) < today || new Date(task.dueDate) > weekEnd) return false;
+        } else if (filters.dueDate === "none") {
+          if (task.dueDate) return false;
+        }
+      }
+
+      // Has subtasks filter
+      if (filters.hasSubtasks === true && task.subtasks.length === 0) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [allTasks, filters]);
+
+  // Group filtered tasks by column
+  const filteredColumns = useMemo(() => {
+    if (!data?.project.columns) return [];
+    return data.project.columns.map((column) => ({
+      ...column,
+      tasks: filteredTasks.filter((t) => t.column.id === column.id),
+    }));
+  }, [data?.project.columns, filteredTasks]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -417,33 +567,84 @@ export default function ProjectBoardPage({
               </Button>
             </div>
           </div>
+
+          {/* View Switcher & Filters */}
+          <div className="container px-4 py-3 border-t">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <ViewSwitcher view={view} onViewChange={setView} />
+
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <FilterBar
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  assignees={allAssignees}
+                  labels={allLabels}
+                  columns={project.columns}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex-1 overflow-x-auto overflow-y-hidden">
           <div className="container h-full py-6">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCorners}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="flex gap-4 h-full">
-                {project.columns.map((column) => (
-                  <KanbanColumn
-                    key={column.id}
-                    column={column}
-                    onCreateTask={setCreateDialogColumnId}
-                    onTaskClick={setSelectedTaskId}
-                  />
-                ))}
-              </div>
+            {view === "board" && (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="flex gap-4 h-full">
+                  {filteredColumns.map((column) => (
+                    <KanbanColumn
+                      key={column.id}
+                      column={column}
+                      onCreateTask={setCreateDialogColumnId}
+                      onTaskClick={setSelectedTaskId}
+                    />
+                  ))}
+                </div>
 
-              <DragOverlay>
-                {activeTask ? (
-                  <TaskCard task={activeTask} onClick={() => {}} />
-                ) : null}
-              </DragOverlay>
-            </DndContext>
+                <DragOverlay>
+                  {activeTask ? (
+                    <TaskCard task={activeTask} onClick={() => {}} />
+                  ) : null}
+                </DragOverlay>
+              </DndContext>
+            )}
+
+            {view === "list" && (
+              <ListView
+                projectId={params.projectId}
+                tasks={filteredTasks}
+                columns={project.columns}
+                onTaskClick={setSelectedTaskId}
+                onCreateTask={setCreateDialogColumnId}
+                view={view}
+              />
+            )}
+
+            {view === "calendar" && (
+              <CalendarView
+                projectId={params.projectId}
+                tasks={filteredTasks}
+                columns={project.columns}
+                onTaskClick={setSelectedTaskId}
+                onCreateTask={setCreateDialogColumnId}
+                view="month"
+              />
+            )}
+
+            {view === "timeline" && (
+              <TimelineView
+                projectId={params.projectId}
+                tasks={filteredTasks}
+                columns={project.columns}
+                onTaskClick={setSelectedTaskId}
+                onCreateTask={setCreateDialogColumnId}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -453,8 +654,7 @@ export default function ProjectBoardPage({
           {selectedTaskId && (
             <TaskDetail taskId={selectedTaskId} projectId={params.projectId} />
           )}
-        </SheetContent>
-      </Sheet>
+        </SheetContent      </Sheet>
 
       <CreateTaskDialog
         open={!!createDialogColumnId}
@@ -463,5 +663,13 @@ export default function ProjectBoardPage({
         columnId={createDialogColumnId || ""}
       />
     </>
+  );
+}
+
+function isSameDay(date1: Date, date2: Date): boolean {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
   );
 }

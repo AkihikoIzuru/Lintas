@@ -77,6 +77,7 @@ export const createTaskSchema = z.object({
   columnId: z.string().cuid(),
   priority: z.enum(["URGENT", "HIGH", "MEDIUM", "LOW"]).default("MEDIUM"),
   dueDate: z.string().datetime().optional().nullable(),
+  startDate: z.string().datetime().optional().nullable(),
   estimate: z.number().int().positive().optional(),
   assigneeIds: z.array(z.string().cuid()).optional(),
   labelIds: z.array(z.string().cuid()).optional(),
