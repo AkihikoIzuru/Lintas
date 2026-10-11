@@ -34,6 +34,7 @@ import {
   Trash2,
   Plus,
   MoreVertical,
+  X,
 } from "lucide-react";
 import { getInitials, formatRelativeTime } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,6 +44,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import { format, parseISO } from "date-fns";
 
 interface TaskDetailProps {
   taskId: string;
@@ -237,6 +240,77 @@ export function TaskDetail({ taskId, projectId }: TaskDetailProps) {
               {task.description || "Klik untuk menambahkan deskripsi..."}
             </div>
           )}
+        </div>
+
+        {/* Dates */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* Start Date */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Tanggal Mulai
+            </Label>
+            <div className="relative">
+              <Input
+                type="date"
+                value={task.startDate ? format(parseISO(task.startDate), "yyyy-MM-dd") : ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateTask.mutate({
+                    startDate: value ? new Date(value).toISOString() : null
+                  });
+                }}
+                className="w-full"
+              />
+              {task.startDate && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1 h-7 w-7"
+                  onClick={() => updateTask.mutate({ startDate: null })}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Due Date */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Jatuh Tempo
+            </Label>
+            <div className="relative">
+              <Input
+                type="date"
+                value={task.dueDate ? format(parseISO(task.dueDate), "yyyy-MM-dd") : ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateTask.mutate({
+                    dueDate: value ? new Date(value).toISOString() : null
+                  });
+                }}
+                className={cn(
+                  "w-full",
+                  task.dueDate && new Date(task.dueDate) < new Date() && "border-destructive"
+                )}
+              />
+              {task.dueDate && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1 h-7 w-7"
+                  onClick={() => updateTask.mutate({ dueDate: null })}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              )}
+            </div>
+            {task.dueDate && new Date(task.dueDate) < new Date() && (
+              <p className="text-xs text-destructive">Tugas terlambat!</p>
+            )}
+          </div>
         </div>
 
         {/* Assignees */}

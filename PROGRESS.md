@@ -255,6 +255,11 @@ See `docs/MANUAL_SETUP.md` for detailed instructions.
 - [ ] Bulk operations
 - [ ] Database migration for startDate field
 
+### GitHub Status:
+- ✅ Branch created: `phase-4-views-filters`
+- ✅ Branch pushed to origin
+- ⏳ PR pending creation (gh CLI timeout - create manually at https://github.com/AkihikoIzuru/Lintas/pull/new/phase-4-views-filters)
+
 ## Technical Debt / TODOs
 - [ ] Add more shadcn/ui components as needed
 - [ ] Set up error boundaries

@@ -49,6 +49,7 @@ import { TaskDetail } from "@/components/board/task-detail";
 import { CreateTaskDialog } from "@/components/board/create-task-dialog";
 import { ViewSwitcher, ViewType } from "@/components/board/view-switcher";
 import { FilterBar, TaskFilters } from "@/components/board/filter-bar";
+import { SavedFilters } from "@/components/board/saved-filters";
 import { ListView } from "@/components/board/list-view";
 import { CalendarView } from "@/components/board/calendar-view";
 import { TimelineView } from "@/components/board/timeline-view";
@@ -323,6 +324,10 @@ export default function ProjectBoardPage({
     hasSubtasks: null,
   });
 
+  const handleLoadFilter = (savedFilters: any) => {
+    setFilters(savedFilters);
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -580,6 +585,12 @@ export default function ProjectBoardPage({
                   assignees={allAssignees}
                   labels={allLabels}
                   columns={project.columns}
+                />
+                <SavedFilters
+                  projectId={params.projectId}
+                  workspaceId={project.workspace.id}
+                  currentFilters={filters}
+                  onLoadFilter={handleLoadFilter}
                 />
               </div>
             </div>
