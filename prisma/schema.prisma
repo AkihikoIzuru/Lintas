@@ -129,26 +129,31 @@ model User {
   updatedAt     DateTime  @updatedAt
   lastActiveAt  DateTime?
 
-  accounts      Account[]
-  sessions      Session[]
-  workspaces    WorkspaceMember[]
-  ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
-  assignedTasks TaskAssignee[]
-  createdTasks  Task[] @relation("TaskCreator")
-  updatedTasks  Task[] @relation("TaskUpdater")
-  comments      Comment[]
-  activities    Activity[]
-  notifications Notification[]
-  mentions      Mention[]
-  notificationSettings NotificationSetting[]
-  timeEntries   TimeEntry[]
-  createdAutomationRules AutomationRule[]
-  createdWebhooks Webhook[]
-  createdRecurringTasks RecurringTask[]
-  createdTaskTemplates TaskTemplate[]
+  accounts                Account[]
+  sessions                Session[]
+  workspaces              WorkspaceMember[]
+  ownedWorkspaces         Workspace[]           @relation("WorkspaceOwner")
+  assignedTasks           TaskAssignee[]
+  createdTasks            Task[]                @relation("TaskCreator")
+  updatedTasks            Task[]                @relation("TaskUpdater")
+  comments                Comment[]
+  activities              Activity[]
+  notifications           Notification[]
+  mentions                Mention[]
+  notificationSettings    NotificationSetting[]
+  timeEntries             TimeEntry[]
+  createdAutomationRules  AutomationRule[]
+  createdWebhooks         Webhook[]
+  createdRecurringTasks   RecurringTask[]
+  createdTaskTemplates    TaskTemplate[]
   createdProjectTemplates ProjectTemplate[]
-  createdMilestones Milestone[]
-  templateUsages TemplateUsage[]
+  createdMilestones       Milestone[]
+  templateUsages          TemplateUsage[]
+  Invitation              Invitation[]
+  ProjectMember           ProjectMember[]
+  Attachment              Attachment[]
+  SavedFilter             SavedFilter[]
+  UserSettings            UserSettings?
 
   @@index([email])
   @@map("users")
@@ -205,18 +210,18 @@ model Workspace {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner       User         @relation("WorkspaceOwner", fields: [ownerId], references: [id])
-  members     WorkspaceMember[]
-  projects    Project[]
-  invitations Invitation[]
-  labels      Label[]
-  sprints     Sprint[]
-  customFields CustomField[]
-  automationRules AutomationRule[]
-  webhooks    Webhook[]
-  taskTemplates TaskTemplate[]
+  owner            User              @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  members          WorkspaceMember[]
+  projects         Project[]
+  invitations      Invitation[]
+  labels           Label[]
+  sprints          Sprint[]
+  customFields     CustomField[]
+  automationRules  AutomationRule[]
+  webhooks         Webhook[]
+  taskTemplates    TaskTemplate[]
   projectTemplates ProjectTemplate[]
-  savedFilters SavedFilter[]
+  savedFilters     SavedFilter[]
 
   @@index([ownerId])
   @@index([slug])
@@ -262,7 +267,7 @@ model Invitation {
 model Project {
   id          String   @id @default(cuid())
   name        String
-  key         String   // Short key like "PROJ", "TIX"
+  key         String // Short key like "PROJ", "TIX"
   description String?  @db.Text
   color       String   @default("#3B82F6")
   icon        String   @default("folder")
@@ -271,18 +276,19 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  members     ProjectMember[]
-  columns     Column[]
-  tasks       Task[]
-  labels      Label[]
-  sprints     Sprint[]
-  customFields CustomField[]
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  members         ProjectMember[]
+  columns         Column[]
+  tasks           Task[]
+  labels          Label[]
+  sprints         Sprint[]
+  customFields    CustomField[]
   automationRules AutomationRule[]
-  webhooks    Webhook[]
-  taskTemplates TaskTemplate[]
-  milestones  Milestone[]
-  recurringTasks RecurringTask[]
+  webhooks        Webhook[]
+  taskTemplates   TaskTemplate[]
+  milestones      Milestone[]
+  recurringTasks  RecurringTask[]
+  SavedFilter     SavedFilter[]
 
   @@unique([workspaceId, key])
   @@index([workspaceId])
@@ -291,41 +297,42 @@ model Project {
 }
 
 model Task {
-  id           String       @id @default(cuid())
-  title        String
-  description  String?      @db.Text
-  position     Float        // Fractional indexing within column
-  priority     TaskPriority @default(MEDIUM)
-  startDate    DateTime?    // Start date for timeline/gantt view
-  dueDate      DateTime?
-  estimate     Int?         // Story points or hours
-  timeSpent    Int          @default(0) // Minutes
-  isArchived   Boolean      @default(false)
-  completedAt  DateTime?
-  projectId    String
-  columnId     String
-  creatorId    String
-  updaterId    String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  position    Float // Fractional indexing within column
+  priority    TaskPriority @default(MEDIUM)
+  startDate   DateTime? // Start date for timeline/gantt view
+  dueDate     DateTime?
+  estimate    Int? // Story points or hours
+  timeSpent   Int          @default(0) // Minutes
+  isArchived  Boolean      @default(false)
+  completedAt DateTime?
+  projectId   String
+  columnId    String
+  creatorId   String
+  updaterId   String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
-  project      Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  column       Column               @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  creator      User                 @relation("TaskCreator", fields: [creatorId], references: [id])
-  updater      User                 @relation("TaskUpdater", fields: [updaterId], references: [id])
-  assignees    TaskAssignee[]
-  labels       TaskLabel[]
-  subtasks     Subtask[]
-  comments     Comment[]
-  attachments  Attachment[]
-  activities   Activity[]
-  mentions     Mention[]
-  sprintTasks  SprintTask[]
-  dependencies TaskDependency[] @relation("TaskDependencies")
-  dependedBy   TaskDependency[] @relation("DependedByTasks")
-  customFieldValues CustomFieldValue[]
-  timeEntries  TimeEntry[]
-  milestones   MilestoneTask[]
+  project              Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  column               Column                 @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  creator              User                   @relation("TaskCreator", fields: [creatorId], references: [id])
+  updater              User                   @relation("TaskUpdater", fields: [updaterId], references: [id])
+  assignees            TaskAssignee[]
+  labels               TaskLabel[]
+  subtasks             Subtask[]
+  comments             Comment[]
+  attachments          Attachment[]
+  activities           Activity[]
+  mentions             Mention[]
+  sprintTasks          SprintTask[]
+  dependencies         TaskDependency[]       @relation("TaskDependencies")
+  dependedBy           TaskDependency[]       @relation("DependedByTasks")
+  customFieldValues    CustomFieldValue[]
+  timeEntries          TimeEntry[]
+  milestones           MilestoneTask[]
+  RecurringTaskHistory RecurringTaskHistory[]
 
   @@index([projectId])
   @@index([columnId])
@@ -356,15 +363,15 @@ model ProjectMember {
 }
 
 model Column {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   name      String
   status    TaskStatus @unique
-  position  Float    // Fractional indexing
+  position  Float // Fractional indexing
   wipLimit  Int?
-  color     String   @default("#6B7280")
+  color     String     @default("#6B7280")
   projectId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks   Task[]
@@ -383,8 +390,8 @@ model Label {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  project   Project?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project   Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks     TaskLabel[]
 
   @@unique([name, workspaceId, projectId])
@@ -393,58 +400,10 @@ model Label {
   @@map("labels")
 }
 
-model Task {
-  id           String       @id @default(cuid())
-  title        String
-  description  String?      @db.Text
-  position     Float        // Fractional indexing within column
-  priority     TaskPriority @default(MEDIUM)
-  startDate    DateTime?    // Start date for timeline/gantt view
-  dueDate      DateTime?
-  estimate     Int?         // Story points or hours
-  timeSpent    Int          @default(0) // Minutes
-  isArchived   Boolean      @default(false)
-  completedAt  DateTime?
-  projectId    String
-  columnId     String
-  creatorId    String
-  updaterId    String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  project      Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  column       Column          @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  creator      User            @relation("TaskCreator", fields: [creatorId], references: [id])
-  updater      User            @relation("TaskUpdater", fields: [updaterId], references: [id])
-  assignees    TaskAssignee[]
-  labels       TaskLabel[]
-  subtasks     Subtask[]
-  comments     Comment[]
-  attachments  Attachment[]
-  activities   Activity[]
-  mentions     Mention[]
-  sprintTasks  SprintTask[]
-  dependencies TaskDependency[] @relation("TaskDependencies")
-  dependedBy   TaskDependency[] @relation("DependedByTasks")
-  customFieldValues CustomFieldValue[]
-  timeEntries  TimeEntry[]
-
-  @@index([projectId])
-  @@index([columnId])
-  @@index([position])
-  @@index([priority])
-  @@index([startDate])
-  @@index([dueDate])
-  @@index([isArchived])
-  @@index([creatorId])
-  @@index([updaterId])
-  @@map("tasks")
-}
-
 model TaskAssignee {
-  id        String   @id @default(cuid())
-  taskId    String
-  userId    String
+  id         String   @id @default(cuid())
+  taskId     String
+  userId     String
   assignedAt DateTime @default(now())
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -494,8 +453,8 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  task   Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  author User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  task     Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   mentions Mention[]
 
   @@index([taskId])
@@ -504,16 +463,16 @@ model Comment {
 }
 
 model Attachment {
-  id        String   @id @default(cuid())
-  name      String
-  url       String
-  mimeType  String
-  size      Int
-  taskId    String
+  id           String   @id @default(cuid())
+  name         String
+  url          String
+  mimeType     String
+  size         Int
+  taskId       String
   uploadedById String
-  createdAt DateTime @default(now())
+  createdAt    DateTime @default(now())
 
-  task      Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task       Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   uploadedBy User @relation(fields: [uploadedById], references: [id])
 
   @@index([taskId])
@@ -567,8 +526,8 @@ model Sprint {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  project   Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  workspace Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project   Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
   tasks     SprintTask[]
 
   @@index([workspaceId])
@@ -578,10 +537,10 @@ model Sprint {
 }
 
 model SprintTask {
-  id        String   @id @default(cuid())
-  sprintId  String
-  taskId    String
-  addedAt   DateTime @default(now())
+  id       String   @id @default(cuid())
+  sprintId String
+  taskId   String
+  addedAt  DateTime @default(now())
 
   sprint Sprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
@@ -611,19 +570,19 @@ model Notification {
 }
 
 model SavedFilter {
-  id        String   @id @default(cuid())
-  name      String
-  filters   Json
-  userId    String
+  id          String   @id @default(cuid())
+  name        String
+  filters     Json
+  userId      String
   workspaceId String?
-  projectId String?
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  projectId   String?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  project   Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([workspaceId])
@@ -632,16 +591,16 @@ model SavedFilter {
 }
 
 model UserSettings {
-  id             String @id @default(cuid())
-  userId         String @unique
-  emailNotifications Boolean @default(true)
-  pushNotifications  Boolean @default(true)
-  desktopNotifications Boolean @default(false)
-  digestFrequency    String  @default("daily") // never, daily, weekly
-  compactMode        Boolean @default(false)
-  sidebarCollapsed   Boolean @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  emailNotifications   Boolean  @default(true)
+  pushNotifications    Boolean  @default(true)
+  desktopNotifications Boolean  @default(false)
+  digestFrequency      String   @default("daily") // never, daily, weekly
+  compactMode          Boolean  @default(false)
+  sidebarCollapsed     Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -657,8 +616,8 @@ model TaskDependency {
   type            String   @default("blocks") // blocks, is_blocked_by, relates_to
   createdAt       DateTime @default(now())
 
-  task           Task @relation("TaskDependencies", fields: [taskId], references: [id], onDelete: Cascade)
-  dependsOnTask  Task @relation("DependedByTasks", fields: [dependsOnTaskId], references: [id], onDelete: Cascade)
+  task          Task @relation("TaskDependencies", fields: [taskId], references: [id], onDelete: Cascade)
+  dependsOnTask Task @relation("DependedByTasks", fields: [dependsOnTaskId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, dependsOnTaskId])
   @@index([taskId])
@@ -667,21 +626,21 @@ model TaskDependency {
 }
 
 model CustomField {
-  id           String        @id @default(cuid())
-  name         String
-  type         CustomFieldType
-  options      Json?         // For select/multi_select: array of {value, label, color?}
-  description  String?       @db.Text
-  isRequired   Boolean       @default(false)
-  position     Int           @default(0)
-  projectId    String?
-  workspaceId  String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id          String          @id @default(cuid())
+  name        String
+  type        CustomFieldType
+  options     Json? // For select/multi_select: array of {value, label, color?}
+  description String?         @db.Text
+  isRequired  Boolean         @default(false)
+  position    Int             @default(0)
+  projectId   String?
+  workspaceId String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
-  project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workspace    Workspace?    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  values       CustomFieldValue[]
+  project   Project?           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace Workspace?         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  values    CustomFieldValue[]
 
   @@index([projectId])
   @@index([workspaceId])
@@ -690,15 +649,15 @@ model CustomField {
 }
 
 model CustomFieldValue {
-  id             String   @id @default(cuid())
-  customFieldId  String
-  taskId         String
-  value          Json     // Stores value based on field type
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(cuid())
+  customFieldId String
+  taskId        String
+  value         Json // Stores value based on field type
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  customField    CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
-  task           Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  customField CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@unique([customFieldId, taskId])
   @@index([taskId])
@@ -706,22 +665,22 @@ model CustomFieldValue {
 }
 
 model AutomationRule {
-  id          String           @id @default(cuid())
+  id          String            @id @default(cuid())
   name        String
-  description String?          @db.Text
+  description String?           @db.Text
   trigger     AutomationTrigger
-  conditions  Json             // Array of conditions
-  actions     Json             // Array of actions
-  enabled     Boolean          @default(true)
+  conditions  Json // Array of conditions
+  actions     Json // Array of actions
+  enabled     Boolean           @default(true)
   projectId   String?
   workspaceId String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   createdById String
 
-  project     Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdBy   User             @relation(fields: [createdById], references: [id])
+  project   Project?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User       @relation(fields: [createdById], references: [id])
 
   @@index([projectId])
   @@index([workspaceId])
@@ -742,9 +701,9 @@ model Webhook {
   updatedAt   DateTime @updatedAt
   createdById String
 
-  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdBy   User @relation(fields: [createdById], references: [id])
+  project   Project?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User       @relation(fields: [createdById], references: [id])
 
   @@index([projectId])
   @@index([workspaceId])
@@ -757,13 +716,13 @@ model Webhook {
 model NotificationSetting {
   id        String   @id @default(cuid())
   userId    String
-  channel   String   // email, push, in_app
-  eventType String   // e.g., ASSIGNED, MENTIONED, DUE_SOON
+  channel   String // email, push, in_app
+  eventType String // e.g., ASSIGNED, MENTIONED, DUE_SOON
   enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, channel, eventType])
   @@index([userId])
@@ -773,15 +732,15 @@ model NotificationSetting {
 // Phase 8: Advanced Project Features
 
 model TimeEntry {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   taskId      String
   userId      String
-  duration    Int      // Minutes
-  description String?  @db.Text
+  duration    Int // Minutes
+  description String?   @db.Text
   startedAt   DateTime
   endedAt     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -793,22 +752,23 @@ model TimeEntry {
 }
 
 model RecurringTask {
-  id              String   @id @default(cuid())
-  name            String
-  templateData    Json     // Full task template
-  frequency       String   // daily, weekly, monthly, custom
-  interval        Int      @default(1) // Every N periods
-  daysOfWeek      Int[]?   // For weekly: [0,1,2,3,4,5,6] (0=Sunday)
-  dayOfMonth      Int?     // For monthly: 1-31
-  nextOccurrence  DateTime
-  isActive        Boolean  @default(true)
-  projectId       String
-  createdById     String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  templateData   Json // Full task template
+  frequency      String // daily, weekly, monthly, custom
+  interval       Int      @default(1) // Every N periods
+  daysOfWeek     Int[]    @default([]) // For weekly: [0,1,2,3,4,5,6] (0=Sunday)
+  dayOfMonth     Int? // For monthly: 1-31
+  nextOccurrence DateTime
+  isActive       Boolean  @default(true)
+  projectId      String
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdBy User @relation(fields: [createdById], references: [id])
+  project              Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy            User                   @relation(fields: [createdById], references: [id])
+  RecurringTaskHistory RecurringTaskHistory[]
 
   @@index([projectId])
   @@index([nextOccurrence])
@@ -817,20 +777,20 @@ model RecurringTask {
 }
 
 model TaskTemplate {
-  id          String   @id @default(cuid())
-  name        String
-  description String?  @db.Text
-  templateData Json    // Complete task data
-  projectId   String?
-  workspaceId String?
-  isPublic    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdById String
+  id           String   @id @default(cuid())
+  name         String
+  description  String?  @db.Text
+  templateData Json // Complete task data
+  projectId    String?
+  workspaceId  String?
+  isPublic     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdById  String
 
-  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdBy   User @relation(fields: [createdById], references: [id])
+  project   Project?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User       @relation(fields: [createdById], references: [id])
 
   @@index([projectId])
   @@index([workspaceId])
@@ -839,19 +799,19 @@ model TaskTemplate {
 }
 
 model ProjectTemplate {
-  id            String   @id @default(cuid())
-  name          String
-  description   String?  @db.Text
-  columns       Json     // Array of column templates
-  labels        Json?    // Array of label templates
-  isPublic      Boolean  @default(false)
-  workspaceId   String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  createdById   String
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  columns     Json // Array of column templates
+  labels      Json? // Array of label templates
+  isPublic    Boolean  @default(false)
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdBy User @relation(fields: [createdById], references: [id])
+  createdBy User      @relation(fields: [createdById], references: [id])
 
   @@index([workspaceId])
   @@index([isPublic])
@@ -859,19 +819,19 @@ model ProjectTemplate {
 }
 
 model Milestone {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
-  description String?  @db.Text
+  description String?   @db.Text
   dueDate     DateTime
   completedAt DateTime?
   projectId   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   createdById String
 
-  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdBy   User @relation(fields: [createdById], references: [id])
-  tasks       MilestoneTask[]
+  project   Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy User            @relation(fields: [createdById], references: [id])
+  tasks     MilestoneTask[]
 
   @@index([projectId])
   @@index([dueDate])
@@ -879,13 +839,13 @@ model Milestone {
 }
 
 model MilestoneTask {
-  id           String     @id @default(cuid())
-  milestoneId  String
-  taskId       String
-  createdAt    DateTime   @default(now())
+  id          String   @id @default(cuid())
+  milestoneId String
+  taskId      String
+  createdAt   DateTime @default(now())
 
-  milestone    Milestone  @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
-  task         Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  milestone Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@unique([milestoneId, taskId])
   @@index([milestoneId])
@@ -899,8 +859,8 @@ model RecurringTaskHistory {
   taskId          String
   createdAt       DateTime @default(now())
 
-  recurringTask   RecurringTask @relation(fields: [recurringTaskId], references: [id], onDelete: Cascade)
-  task            Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  recurringTask RecurringTask @relation(fields: [recurringTaskId], references: [id], onDelete: Cascade)
+  task          Task          @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([recurringTaskId])
   @@index([taskId])
@@ -911,9 +871,10 @@ model RecurringTaskHistory {
 model TemplateUsage {
   id           String   @id @default(cuid())
   templateId   String
-  templateType String   // "task" | "project"
+  templateType String // "task" | "project"
   userId       String
   createdAt    DateTime @default(now())
+  User         User     @relation(fields: [userId], references: [id])
 
   @@index([templateId])
   @@index([templateType])
