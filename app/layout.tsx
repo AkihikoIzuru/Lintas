@@ -6,7 +6,6 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { GlobalSearchProvider } from "@/components/providers/global-search-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { reportWebVitals } from "@/lib/performance";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -76,20 +75,6 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var script = document.createElement('script');
-                  script.src = '/vercel-insights.js';
-                  script.defer = true;
-                  document.head.appendChild(script);
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -104,9 +89,4 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
-
-// Report Web Vitals in production
-export function reportWebVitals(metric: any) {
-  reportWebVitals(metric);
 }

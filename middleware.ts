@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   // Run auth middleware
-  const authResult = await auth(request as any);
+  const authResult = await auth(request);
 
   // Add security headers
   const response = authResult || NextResponse.next();
