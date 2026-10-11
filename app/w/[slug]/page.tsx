@@ -170,9 +170,9 @@ export default function WorkspacePage({
         <TabsContent value="sprints" className="mt-4">
           <SprintList
             workspaceId={data?.workspace?.id || ""}
+            workspaceSlug={params.slug}
             onSprintClick={(sprintId) => {
-              // TODO: Navigate to sprint detail page
-              console.log("Sprint clicked:", sprintId);
+              router.push(`/w/${params.slug}/sprints/${sprintId}`);
             }}
           />
         </TabsContent>

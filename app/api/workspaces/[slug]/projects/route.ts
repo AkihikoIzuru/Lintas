@@ -35,13 +35,20 @@ export async function GET(
             columns: true,
           },
         },
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
       },
       orderBy: {
         updatedAt: "desc",
       },
     });
 
-    return NextResponse.json({ projects });
+    return NextResponse.json({ projects, workspace: { id: workspace.id, name: workspace.name, slug: workspace.slug } });
   } catch (error: any) {
     if (error.message.includes("Forbidden")) {
       return NextResponse.json({ error: error.message }, { status: 403 });

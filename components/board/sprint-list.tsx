@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import {
@@ -63,11 +64,13 @@ interface Sprint {
 
 interface SprintListProps {
   workspaceId: string;
+  workspaceSlug?: string;
   projectId?: string;
   onSprintClick?: (sprintId: string) => void;
 }
 
-export function SprintList({ workspaceId, projectId, onSprintClick }: SprintListProps) {
+export function SprintList({ workspaceId, workspaceSlug, projectId, onSprintClick }: SprintListProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -252,7 +255,13 @@ export function SprintList({ workspaceId, projectId, onSprintClick }: SprintList
             <Card
               key={sprint.id}
               className="hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => onSprintClick?.(sprint.id)}
+              onClick={() => {
+                if (onSprintClick) {
+                  onSprintClick(sprint.id);
+                } else if (workspaceSlug) {
+                  router.push(`/w/${workspaceSlug}/sprints/${sprint.id}`);
+                }
+              }}
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
