@@ -57,6 +57,8 @@ enum ActivityType {
   ARCHIVED
   RESTORED
   DELETED
+  DEPENDENCY_ADDED
+  DEPENDENCY_REMOVED
 }
 
 enum NotificationType {
@@ -69,6 +71,44 @@ enum NotificationType {
   SPRINT_ENDING
   TASK_MOVED
   TASK_UPDATED
+  DEPENDENCY_BLOCKED
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  DATE
+  SELECT
+  MULTI_SELECT
+  CHECKBOX
+  URL
+  EMAIL
+}
+
+enum AutomationTrigger {
+  TASK_CREATED
+  TASK_UPDATED
+  TASK_MOVED
+  TASK_COMPLETED
+  TASK_OVERDUE
+  SPRINT_STARTED
+  SPRINT_ENDED
+  COMMENT_ADDED
+  MENTION_ADDED
+}
+
+enum AutomationAction {
+  ASSIGN_USER
+  CHANGE_PRIORITY
+  CHANGE_STATUS
+  ADD_LABEL
+  REMOVE_LABEL
+  SET_DUE_DATE
+  ADD_TO_SPRINT
+  REMOVE_FROM_SPRINT
+  SEND_NOTIFICATION
+  CREATE_TASK
+  WEBHOOK
 }
 
 // ============================================================
@@ -100,6 +140,14 @@ model User {
   activities    Activity[]
   notifications Notification[]
   mentions      Mention[]
+  notificationSettings NotificationSetting[]
+  timeEntries   TimeEntry[]
+  createdAutomationRules AutomationRule[]
+  createdWebhooks Webhook[]
+  createdRecurringTasks RecurringTask[]
+  createdTaskTemplates TaskTemplate[]
+  createdProjectTemplates ProjectTemplate[]
+  createdMilestones Milestone[]
 
   @@index([email])
   @@map("users")
@@ -162,6 +210,12 @@ model Workspace {
   invitations Invitation[]
   labels      Label[]
   sprints     Sprint[]
+  customFields CustomField[]
+  automationRules AutomationRule[]
+  webhooks    Webhook[]
+  taskTemplates TaskTemplate[]
+  projectTemplates ProjectTemplate[]
+  savedFilters SavedFilter[]
 
   @@index([ownerId])
   @@index([slug])
@@ -222,6 +276,12 @@ model Project {
   tasks       Task[]
   labels      Label[]
   sprints     Sprint[]
+  customFields CustomField[]
+  automationRules AutomationRule[]
+  webhooks    Webhook[]
+  taskTemplates TaskTemplate[]
+  milestones  Milestone[]
+  recurringTasks RecurringTask[]
 
   @@unique([workspaceId, key])
   @@index([workspaceId])
@@ -314,6 +374,10 @@ model Task {
   activities   Activity[]
   mentions     Mention[]
   sprintTasks  SprintTask[]
+  dependencies TaskDependency[] @relation("TaskDependencies")
+  dependedBy   TaskDependency[] @relation("DependedByTasks")
+  customFieldValues CustomFieldValue[]
+  timeEntries  TimeEntry[]
 
   @@index([projectId])
   @@index([columnId])
@@ -532,4 +596,233 @@ model UserSettings {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
+}
+
+// Phase 6: Search & Advanced Features
+
+model TaskDependency {
+  id              String   @id @default(cuid())
+  taskId          String
+  dependsOnTaskId String
+  type            String   @default("blocks") // blocks, is_blocked_by, relates_to
+  createdAt       DateTime @default(now())
+
+  task           Task @relation("TaskDependencies", fields: [taskId], references: [id], onDelete: Cascade)
+  dependsOnTask  Task @relation("DependedByTasks", fields: [dependsOnTaskId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, dependsOnTaskId])
+  @@index([taskId])
+  @@index([dependsOnTaskId])
+  @@map("task_dependencies")
+}
+
+model CustomField {
+  id           String        @id @default(cuid())
+  name         String
+  type         CustomFieldType
+  options      Json?         // For select/multi_select: array of {value, label, color?}
+  description  String?       @db.Text
+  isRequired   Boolean       @default(false)
+  position     Int           @default(0)
+  projectId    String?
+  workspaceId  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  project      Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace    Workspace?    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  values       CustomFieldValue[]
+
+  @@index([projectId])
+  @@index([workspaceId])
+  @@index([position])
+  @@map("custom_fields")
+}
+
+model CustomFieldValue {
+  id             String   @id @default(cuid())
+  customFieldId  String
+  taskId         String
+  value          Json     // Stores value based on field type
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  customField    CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  task           Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([customFieldId, taskId])
+  @@index([taskId])
+  @@map("custom_field_values")
+}
+
+model AutomationRule {
+  id          String           @id @default(cuid())
+  name        String
+  description String?          @db.Text
+  trigger     AutomationTrigger
+  conditions  Json             // Array of conditions
+  actions     Json             // Array of actions
+  enabled     Boolean          @default(true)
+  projectId   String?
+  workspaceId String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  createdById String
+
+  project     Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User             @relation(fields: [createdById], references: [id])
+
+  @@index([projectId])
+  @@index([workspaceId])
+  @@index([enabled])
+  @@map("automation_rules")
+}
+
+model Webhook {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  secret      String?
+  events      String[] // Array of event names
+  enabled     Boolean  @default(true)
+  projectId   String?
+  workspaceId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String
+
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  @@index([projectId])
+  @@index([workspaceId])
+  @@index([enabled])
+  @@map("webhooks")
+}
+
+// Phase 7: Notifications & Real-time
+
+model NotificationSetting {
+  id        String   @id @default(cuid())
+  userId    String
+  channel   String   // email, push, in_app
+  eventType String   // e.g., ASSIGNED, MENTIONED, DUE_SOON
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channel, eventType])
+  @@index([userId])
+  @@map("notification_settings")
+}
+
+// Phase 8: Advanced Project Features
+
+model TimeEntry {
+  id          String   @id @default(cuid())
+  taskId      String
+  userId      String
+  duration    Int      // Minutes
+  description String?  @db.Text
+  startedAt   DateTime
+  endedAt     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([startedAt])
+  @@map("time_entries")
+}
+
+model RecurringTask {
+  id              String   @id @default(cuid())
+  name            String
+  templateData    Json     // Full task template
+  frequency       String   // daily, weekly, monthly, custom
+  interval        Int      @default(1) // Every N periods
+  daysOfWeek      Int[]?   // For weekly: [0,1,2,3,4,5,6] (0=Sunday)
+  dayOfMonth      Int?     // For monthly: 1-31
+  nextOccurrence  DateTime
+  isActive        Boolean  @default(true)
+  projectId       String
+  createdById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  @@index([projectId])
+  @@index([nextOccurrence])
+  @@index([isActive])
+  @@map("recurring_tasks")
+}
+
+model TaskTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  templateData Json    // Complete task data
+  projectId   String?
+  workspaceId String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String
+
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  @@index([projectId])
+  @@index([workspaceId])
+  @@index([isPublic])
+  @@map("task_templates")
+}
+
+model ProjectTemplate {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?  @db.Text
+  columns       Json     // Array of column templates
+  labels        Json?    // Array of label templates
+  isPublic      Boolean  @default(false)
+  workspaceId   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdById   String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  @@index([workspaceId])
+  @@index([isPublic])
+  @@map("project_templates")
+}
+
+model Milestone {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  dueDate     DateTime
+  completedAt DateTime?
+  projectId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String
+
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  @@index([projectId])
+  @@index([dueDate])
+  @@map("milestones")
 }

@@ -567,10 +567,12 @@ export default function ProjectBoardPage({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Pengaturan
-              </Button>
+              <Link href={`/w/${params.slug}/projects/${params.projectId}/settings`}>
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Pengaturan
+                </Button>
+              </Link>
             </div>
           </div>
 
